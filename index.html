@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Eucligo</title>
+    <link href="./css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="./css/bootstrap-grid.css" rel="stylesheet" type="text/css">
+    <link href="./css/bootstrap-reboot.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="./js/essential/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="./js/essential/paper-full.min.js"></script>
+    <script type="text/javascript" src="./js/essential/popper.js"></script>
+    <script type="text/javascript" src="./js/essential/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./js/application/eucligo.js"></script>
+    <script type="text/javascript" src="./js/application/action-manager.js"></script>
+    <script type="text/javascript" src="./js/application/mouse.js"></script>
+    <style>
+        canvas[resize] {
+            border:1px solid #000000;
+            width: 99%;
+            height: 99%;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="point" class="btn btn-secondary" onClick="select('point')">Ponto</button>
+    <button id="segment" class="btn btn-secondary" onClick="select('segment')">Segmento</button>
+    <button id="circle" class="btn btn-secondary" onClick="select('circunference')">Circunferência</button>
+    <button id="line" class="btn btn-secondary" onClick="select('line')">Reta</button>
+    <button id="ray" class="btn btn-secondary" onClick="select('ray')">Semirreta</button>
+
+    <button id="select" class="btn btn-secondary" onClick="select('selection')">Selecionar objetos</button>
+
+    <button id="undo" class="btn btn-secondary" onClick="undo()">Desfazer</button>
+    <button id="redo" class="btn btn-secondary" onClick="redo()">Refazer</button>
+    </br></br>
+
+    <canvas id="canvas" resize ></canvas>
+</body>
+</html>
