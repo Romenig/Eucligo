@@ -26,7 +26,6 @@ var tempPath;
 function mousedown(event, currentBtn){
     switch(currentBtn) {
     case 'selection':
-    console.log("C");
         testHitOnProject(event);
         break;
     case 'point':
@@ -222,8 +221,17 @@ var selectedObjects = [];
 function testHitOnProject(event){
     segmentHitResult = pathHitResult = null;
     var hitResult = project.hitTestAll(event.point, hitOptions);
-    if (hitResult.length == 0 || hitResult[0].isClone){
+    if (hitResult.length == 0){
         project.activeLayer.selected = false;
+        var selectedSize = selectedObjects.length;
+        for(var i = 0; i < selectedSize; i++){
+            console.log(selectedObjects.length)
+            var object = selectedObjects.pop();
+            object.shadowClone.remove();
+            object.shadowClone = null;
+        }
+        return;
+    } else if (hitResult.length > 0 && hitResult[0].isClone){
         return;
     } else {
         for(var i = 0; i < hitResult.length; i++){
@@ -239,6 +247,18 @@ function testHitOnProject(event){
     }   
 }
 
+function generateIntersections(){
+    var strokeList = [];
+    for(var i = 0; i < selectedObjects.length; i++){
+        if(selectedObjects[i].toString.indexOf("oint") == -1){
+            strokeList.push(selectedObjects[i]);
+        }
+    }
+    createIntersections(strokeList);
+}
+
+
+
 function createShadow(item){
     var clone = item.clone();
     clone.strokeWidth = 10;
@@ -253,7 +273,6 @@ function highlightMethod(event){
     var hitResult = project.hitTestAll(event.point, hitOptions);
 
     if (hitResult.length == 0 || hitResult[0].item.isClone){
-        console.log("entrou no if");
         project.activeLayer.selected = false;
         return;
     } else {
@@ -261,7 +280,6 @@ function highlightMethod(event){
             if(!hitResult[i].item.isClone){
                 hitResult[i].item.selected = true;
                 if(hitResult[i].item.toString != "RegularPoint"){
-                    console.log(hitResult[i].item.isClone);
                     hitResult[i].item.relatedObjects[0].selected = true;
                     hitResult[i].item.relatedObjects[1].selected = true;
                 }    

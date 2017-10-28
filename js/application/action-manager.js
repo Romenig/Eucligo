@@ -57,7 +57,67 @@ function createCircunference(args){
 	actionStack.push(action);
 }
 
+//args: two points
+function createIntersections(args){
+	var action = new CreateIntersections();
+	action.setListOfObjects(args);
+	action.execute();
+	actionStack.push(action);
+}
+
 // CLASS DEFINITIONS ////////////////////////////////
+
+function CreateIntersections(){
+	this.intersections = [];
+	this.listOfObjects = null;
+	this.listOfIndexes = null;
+	this.setListOfObjects = function (arg){
+		this.listOfObjects = arg;
+	}	
+	this.execute = function (){
+		console.log("Mandou executar..."+this.listOfObjects.length);
+		if(this.listOfObjects.length > 0){
+			var selectedSize = this.listOfObjects.length;
+		    if(selectedSize > 1){
+		        for(var i = 0; i < selectedSize - 1; i++) {
+		            for(var j = 1; j < selectedSize; j++){
+		            	constructIntersections(this.intersections, this.listOfObjects[i], this.listOfObjects[j]);
+		            }
+		        }    
+		    }
+		}
+	}
+	this.undo = function (){
+
+	}
+
+}
+
+function constructIntersections(listOfIntersections, path1, path2) {
+    var intersections = path1.getIntersections(path2);
+    for (var i = 0; i < intersections.length; i++) {
+    	if(!verifyExistenceOfIntersection(intersections[i].point, listOfIntersections)){
+    		var inter = new paper.Path.Circle({
+	            center: intersections[i].point,
+	            radius: 4,
+	            fillColor: 'red',
+	            strokeColor: 'black',
+	            strokeWidth: 1
+        	});
+        	listOfIntersections.push(inter);
+    	}
+    }
+}
+
+function verifyExistenceOfIntersection(point, list){
+	for(var i = 0; i < list.length; i++){
+		if(list[i].position.x == point.x && list[i].position.y == point.y) 
+			return true;
+	}
+	return false;
+}
+
+
 function CreatePoint(){
 	this.x = 0;
 	this.y = 0;
@@ -164,8 +224,8 @@ function CreateCircle(){
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointA.toString = "CircunferenceCenter";
-		this.pointB.toString = "CircunferenceRay";
+		this.pointA.toString = "CircunferenceCenterPoint";
+		this.pointB.toString = "CircunferenceRayPoint";
 		this.pointA.relatedObjects = [this.pointB];
 		this.pointB.relatedObjects = [this.pointA];
 	}
