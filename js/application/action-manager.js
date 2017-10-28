@@ -69,14 +69,13 @@ function createIntersections(args){
 
 function CreateIntersections(){
 	this.intersections = [];
-	this.listOfObjects = null;
-	this.listOfIndexes = null;
+	this.listOfObjects = [];
+	this.listOfIndexes = [];
 	this.setListOfObjects = function (arg){
 		this.listOfObjects = arg;
 	}	
 	this.execute = function (){
-		console.log("Mandou executar..."+this.listOfObjects.length);
-		if(this.listOfObjects.length > 0){
+		if(this.listOfIndexes.length == 0){
 			var selectedSize = this.listOfObjects.length;
 		    if(selectedSize > 1){
 		        for(var i = 0; i < selectedSize - 1; i++) {
@@ -85,10 +84,17 @@ function CreateIntersections(){
 		            }
 		        }    
 		    }
+		}else{
+			for(var i = 0; i < this.intersections.length; i++){
+				paper.project.activeLayer.insertChild(this.listOfIndexes[i], this.intersections[i]);
+			}
 		}
 	}
 	this.undo = function (){
-
+		for(var i = 0; i < this.intersections.length;i++){
+			this.listOfIndexes[i] = this.intersections[i].index;
+			this.intersections[i].remove();
+		}
 	}
 
 }
@@ -104,6 +110,7 @@ function constructIntersections(listOfIntersections, path1, path2) {
 	            strokeColor: 'black',
 	            strokeWidth: 1
         	});
+        	inter.toString = "EUIntersectionPoint";
         	listOfIntersections.push(inter);
     	}
     }
