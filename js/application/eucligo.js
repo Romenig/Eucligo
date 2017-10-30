@@ -22,6 +22,10 @@ window.onload = function() {
     tool.onMouseMove = function(event) {
         mousemove(event);
     }
+
+    tool.onMouseUp = function(event){
+        mouseup(event, currentBtn);
+    }
     // END: MOUSE EVENTS ------------------------------------------------- //
 }  
 

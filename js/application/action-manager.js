@@ -137,7 +137,7 @@ function CreatePoint(){
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-			this.point.toString = "RegularPoint";
+			this.point.toString = "EURegularPoint";
 		} else {
 			paper.project.activeLayer.insertChild(this.index, this.point);
 		}
@@ -154,12 +154,6 @@ function CreatePoint(){
 			this.point.shadowClone = null;
 		}
 		this.point.remove();
-	}
-	this.updateObject = function(args){
-		this.x = args.x;
-		this.y = args.y;
-		this.point.position.x = this.x;
-		this.point.position.x = this.y;
 	}
 }
 
@@ -197,14 +191,14 @@ function CreateSegment(){
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointA.toString = "SegmentPoint";
+		this.pointA.toString = "EUSegmentPointA";
 		this.pointB = new paper.Path.Circle({
     						center: new paper.Point(b_x, b_y),
     						radius: 4,
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointB.toString = "SegmentPoint";
+		this.pointB.toString = "EUSegmentPointB";
 		this.pointB.relatedObjects = [this.pointA];
 		this.pointA.relatedObjects = [this.pointB];
 	}
@@ -253,8 +247,8 @@ function CreateCircle(){
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointA.toString = "CircunferenceCenterPoint";
-		this.pointB.toString = "CircunferenceRayPoint";
+		this.pointA.toString = "EUCircunferenceCenterPoint";
+		this.pointB.toString = "EUCircunferenceRayPoint";
 		this.pointA.relatedObjects = [this.pointB];
 		this.pointB.relatedObjects = [this.pointA];
 	}
@@ -272,6 +266,7 @@ function CreateCircle(){
 			});
 			this.circunference.toString = "CircunferenceStroke";
 			this.circunference.relatedObjects = [this.pointA, this.pointB];
+			this.circunference.sendToBack();
 			this.pointA.relatedObjects.push(this.circunference);
 			this.pointB.relatedObjects.push(this.circunference);
 

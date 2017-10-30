@@ -20,13 +20,22 @@ var isConstructing = true;
 var point1;
 var point2;
 var tempPath;
+var moveClicked = false;
 
-
+function mouseup(event, currentBtn){
+    switch(currentBtn){
+        case 'move':
+            moveClicked = false;
+            break;
+        default:
+            console.log("default switch mouseup");
+    }
+}
 
 function mousedown(event, currentBtn){
     switch(currentBtn) {
     case 'move':
-        moveObject(event);
+        selectMovingObject(event)
         break;
     case 'selection':
         testHitOnProject(event);
@@ -96,22 +105,39 @@ function mousedown(event, currentBtn){
     }
 }
 
+var movingObject = null;
+
 function moveObject(event){
-    segmentHitResult = pathHitResult = null;
-    var hitResult = project.hitTestAll(event.point, hitOptions);
-    if (hitResult.length == 0 || hitResult[0].item.isClone){
+    if (movingObject == null){
         return;
     } else {
-        for(var i = 0; i < hitResult.length; i++){
-            if(!hitResult[i].item.isClone){
-                if(hitResult[i].item.toString.indexOf("oint") != -1 && hitResult[i].item.toString != 'EUIntersectionPoint'){
-                    $('#canvas').css('cursor','pointer');
-                }               
+        if(movingObject.toString.indexOf("oint") != -1 && movingObject.toString != 'EUIntersectionPoint'){
+            if(movingObject.toString == "EURegularPoint"){
+                movingObject.position = event.point;
+            } else if (movingObject.toString.indexOf("Segment" != -1) ){
+                movingObject.position = event.point;
+                if(movingObject.toString.indexOf("PointA"!=-1)){
+                    movingObject.relatedObjects[1].segments[1].point = event.point;
+                }else{
+                    movingObject.relatedObjects[1].segments[0].point = event.point;
+                }
             }
-        }
+        }               
     }   
 }
 
+function selectMovingObject(event){
+    segmentHitResult = pathHitResult = null;
+    var hitResult = project.hitTest(event.point, hitOptions);
+    if (hitResult == null){
+        return;
+    } else {
+        if(hitResult.item.toString.indexOf("oint") != -1 && hitResult.item.toString != 'EUIntersectionPoint'){
+            movingObject = hitResult.item;
+            moveClicked = true;
+        }
+    }   
+}
 
 function mouseCursor(event){
     segmentHitResult = pathHitResult = null;
@@ -135,9 +161,7 @@ function mousemove(event){
 }
 
 function mousedrag(event){
-    if(window.mobileAndTabletcheck()){
-        moveOrDrag(event);
-    }
+    moveOrDrag(event);
 }
 
 function initConstruction(point){
@@ -243,6 +267,8 @@ function moveOrDrag(event){
         highlightMethod(event);
     } else if(isConstructing && currentBtn == 'move'){
         mouseCursor(event);
+        if(moveClicked)
+            moveObject(event);
     }
 }
 
