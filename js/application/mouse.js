@@ -25,6 +25,9 @@ var tempPath;
 
 function mousedown(event, currentBtn){
     switch(currentBtn) {
+    case 'move':
+        moveObject(event);
+        break;
     case 'selection':
         testHitOnProject(event);
         break;
@@ -93,6 +96,38 @@ function mousedown(event, currentBtn){
     }
 }
 
+function moveObject(event){
+    segmentHitResult = pathHitResult = null;
+    var hitResult = project.hitTestAll(event.point, hitOptions);
+    if (hitResult.length == 0 || hitResult[0].item.isClone){
+        return;
+    } else {
+        for(var i = 0; i < hitResult.length; i++){
+            if(!hitResult[i].item.isClone){
+                if(hitResult[i].item.toString.indexOf("oint") != -1 && hitResult[i].item.toString != 'EUIntersectionPoint'){
+                    $('#canvas').css('cursor','pointer');
+                }               
+            }
+        }
+    }   
+}
+
+
+function mouseCursor(event){
+    segmentHitResult = pathHitResult = null;
+    var hitResult = project.hitTest(event.point, hitOptions);
+    if (hitResult == null){
+        $('#canvas').css('cursor','default');
+        return;
+    } else {
+        if(hitResult.item.toString.indexOf("oint") != -1 && hitResult.item.toString != 'EUIntersectionPoint'){
+            $('#canvas').css('cursor','pointer');
+        } else {
+            $('#canvas').css('cursor','default');
+        }
+    }   
+}
+
 function mousemove(event){
     if(!window.mobileAndTabletcheck()){
         moveOrDrag(event);
@@ -103,6 +138,15 @@ function mousedrag(event){
     if(window.mobileAndTabletcheck()){
         moveOrDrag(event);
     }
+}
+
+function initConstruction(point){
+    point1 = new paper.Path.Circle({
+                            center: new paper.Point(point.x, point.y),
+                            radius: 4,
+                            strokeColor: 'black',
+                            fillColor: 'blue'
+                         });
 }
 
 function moveOrDrag(event){
@@ -197,6 +241,8 @@ function moveOrDrag(event){
     } else if(isConstructing && currentBtn == 'selection'){
         project.activeLayer.selected = false;
         highlightMethod(event);
+    } else if(isConstructing && currentBtn == 'move'){
+        mouseCursor(event);
     }
 }
 
@@ -205,14 +251,7 @@ function distanceBetween2points(pointA, pointB){
     return Math.sqrt(Math.pow((pointA.x - pointB.x),2)+Math.pow((pointA.y - pointB.y),2))
 }
 
-function initConstruction(point){
-    point1 = new paper.Path.Circle({
-                            center: new paper.Point(point.x, point.y),
-                            radius: 4,
-                            strokeColor: 'black',
-                            fillColor: 'blue'
-                         });
-}
+
 
 var segmentHitResult, pathHitResult;
 var movepathHitResult = false;
@@ -225,9 +264,9 @@ function testHitOnProject(event){
         project.activeLayer.selected = false;
         var selectedSize = selectedObjects.length;
         for(var i = 0; i < selectedSize; i++){
-            console.log(selectedObjects.length)
             var object = selectedObjects.pop();
-            object.shadowClone.remove();
+            if(object.shadowClone != null)
+                object.shadowClone.remove();
             object.shadowClone = null;
         }
         return;
@@ -256,8 +295,6 @@ function generateIntersections(){
     }
     createIntersections(strokeList);
 }
-
-
 
 function createShadow(item){
     var clone = item.clone();

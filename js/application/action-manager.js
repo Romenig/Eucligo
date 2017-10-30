@@ -149,7 +149,17 @@ function CreatePoint(){
 	}
 	this.undo = function(){
 		this.index = this.point.index;
+		if(this.point.shadowClone != null){
+			this.point.shadowClone.remove();
+			this.point.shadowClone = null;
+		}
 		this.point.remove();
+	}
+	this.updateObject = function(args){
+		this.x = args.x;
+		this.y = args.y;
+		this.point.position.x = this.x;
+		this.point.position.x = this.y;
 	}
 }
 
@@ -202,6 +212,18 @@ function CreateSegment(){
 		this.indexA = this.pointA.index;
 		this.indexB = this.pointB.index;
 		this.indexS = this.segment.index;
+		if(this.pointA.shadowClone != null){
+			this.pointA.shadowClone.remove();
+			this.pointA.shadowClone = null;
+		}
+		if(this.pointB.shadowClone != null){
+			this.pointB.shadowClone.remove();
+			this.pointB.shadowClone = null;
+		}
+		if(this.segment.shadowClone != null){
+			this.segment.shadowClone.remove();
+			this.segment.shadowClone = null;
+		}
 		this.pointA.remove();
 		this.pointB.remove();
 		this.segment.remove();
@@ -265,6 +287,18 @@ function CreateCircle(){
 		this.indexA = this.pointA.index;
 		this.indexB = this.pointB.index;
 		this.indexS = this.circunference.index;
+		if(this.pointA.shadowClone != null){
+			this.pointA.shadowClone.remove();
+			this.pointA.shadowClone = null;
+		}
+		if(this.pointB.shadowClone != null){
+			this.pointB.shadowClone.remove();
+			this.pointB.shadowClone = null;
+		}
+		if(this.circunference.shadowClone != null){
+			this.circunference.shadowClone.remove();
+			this.circunference.shadowClone = null;
+		}
 		this.circunference.remove();
 		this.pointA.remove();
 		this.pointB.remove();
@@ -324,6 +358,18 @@ function CreateLine(){
 		this.indexA = this.pointA.index;
 		this.indexB = this.pointB.index;
 		this.indexS = this.line.index;
+		if(this.pointA.shadowClone != null){
+			this.pointA.shadowClone.remove();
+			this.pointA.shadowClone = null;
+		}
+		if(this.pointB.shadowClone != null){
+			this.pointB.shadowClone.remove();
+			this.pointB.shadowClone = null;
+		}
+		if(this.line.shadowClone != null){
+			this.line.shadowClone.remove();
+			this.line.shadowClone = null;
+		}
 		this.pointA.remove();
 		this.pointB.remove();
 		this.line.remove();
@@ -390,11 +436,22 @@ function CreateRay(){
 		this.indexA = this.pointA.index;
 		this.indexB = this.pointB.index;
 		this.indexS = this.line.index;
+		if(this.pointA.shadowClone != null){
+			this.pointA.shadowClone.remove();
+			this.pointA.shadowClone = null;
+		}
+		if(this.pointB.shadowClone != null){
+			this.pointB.shadowClone.remove();
+			this.pointB.shadowClone = null;
+		}
+		if(this.line.shadowClone != null){
+			this.line.shadowClone.remove();
+			this.line.shadowClone = null;
+		}
 		this.pointA.remove();
 		this.pointB.remove();
 		this.line.remove();
 	}
-
 }
 
 
