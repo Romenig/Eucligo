@@ -36,6 +36,8 @@ window.mobileAndTabletcheck = function() {
 };
 
 function select(arg){
+    if(arg == "move")
+        unselectObjects();
     currentBtn = arg;
 }
 

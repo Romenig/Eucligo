@@ -172,7 +172,7 @@ function CreateSegment(){
 							    strokeColor: 'black'
 						 	});
 			this.segment.sendToBack();
-			this.segment.toString = "SegmentStroke";
+			this.segment.toString = "EUSegmentStroke";
 			this.segment.relatedObjects = [this.pointA, this.pointB];
 			this.pointA.relatedObjects.push(this.segment);
 			this.pointB.relatedObjects.push(this.segment);
@@ -264,7 +264,7 @@ function CreateCircle(){
 				radius: this.radius,
 				strokeColor: 'black'
 			});
-			this.circunference.toString = "CircunferenceStroke";
+			this.circunference.toString = "EUCircunferenceStroke";
 			this.circunference.relatedObjects = [this.pointA, this.pointB];
 			this.circunference.sendToBack();
 			this.pointA.relatedObjects.push(this.circunference);
@@ -313,11 +313,21 @@ function CreateLine(){
 			var coeficienteAngular = coef(this.pointA.position, this.pointB.position);
             var lineY0 = getLineY(this.pointA.position, 0, coeficienteAngular);
             var lineYwidth = getLineY(this.pointA.position, $("#canvas").width(), coeficienteAngular);
-			this.line = new paper.Path.Line({
+
+            if(coeficienteAngular != Number.POSITIVE_INFINITY && coeficienteAngular != Number.NEGATIVE_INFINITY){
+            	this.line = new paper.Path.Line({
 	    						from: new paper.Point(0,lineY0),
 							    to: new paper.Point($("#canvas").width(), lineYwidth),
 							    strokeColor: 'black'
 						 	});
+            } else {
+            	console.log(coeficienteAngular);
+            	this.line = new paper.Path.Line({
+	    						from: new paper.Point(this.pointA.position.x, 0),
+							    to: new paper.Point(this.pointA.position.x, $("#canvas").height()),
+							    strokeColor: 'black'
+						 	});
+            }
 			this.line.toString = "EULineStroke";
 			this.line.relatedObjects = [this.pointA, this.pointB];
 			this.pointA.relatedObjects.push(this.line);
@@ -391,15 +401,33 @@ function CreateRay(){
                 lineYwidth = getLineY(this.pointA.position, $("#canvas").width(), coeficienteAngular);
                	toPoint = new paper.Point($("#canvas").width(), lineYwidth);
             }
-			this.line = new paper.Path.Line({
+
+            if(coeficienteAngular != Number.POSITIVE_INFINITY && coeficienteAngular != Number.NEGATIVE_INFINITY){
+				this.line = new paper.Path.Line({
 	    						from: this.pointA.position,
 							    to: toPoint,
 							    strokeColor: 'black'
-						 	});
+				});
+            }else{
+            	if(coeficienteAngular == Number.POSITIVE_INFINITY){
+            		this.line = new paper.Path.Line({
+	    						from: this.pointA.position,
+							    to: new paper.Point(this.pointA.position.x, 0),
+							    strokeColor: 'black'
+					});	
+            	}else {
+            		this.line = new paper.Path.Line({
+	    						from: this.pointA.position,
+							    to: new paper.Point(this.pointA.position.x, $("#canvas").height()),
+							    strokeColor: 'black'
+					});	
+            	}
+            }
+
 			this.line.sendToBack();
-			this.line.toString = "RayStroke";
-			this.pointA.relatedObjects.push(this.pointB);
-			this.pointB.relatedObjects.push(this.pointA);
+			this.line.toString = "EURayStroke";
+			this.pointA.relatedObjects.push(this.line);
+			this.pointB.relatedObjects.push(this.line);
 			this.line.relatedObjects = [this.pointA, this.pointB];
 		}
 		else {
@@ -416,14 +444,14 @@ function CreateRay(){
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointA.toString = "RayPoint";
+		this.pointA.toString = "EURayPointA";
 		this.pointB = new paper.Path.Circle({
     						center: new paper.Point(b_x, b_y),
     						radius: 4,
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointB.toString = "RayPoint";
+		this.pointB.toString = "EURayPointB";
 		this.pointA.relatedObjects = [this.pointB];
 		this.pointB.relatedObjects = [this.pointA];
 	}

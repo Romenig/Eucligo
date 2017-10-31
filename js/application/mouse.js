@@ -133,18 +133,55 @@ function moveObject(event){
                 var scaleFactor = distanceBetween2points(movingObject.position, movingObject.relatedObjects[0].position) / (circleStroke.bounds.width/2);
                 circleStroke.scale(scaleFactor);
             }
-        } else if(movingObject.toString.indexOf("EULineStroke")){
-            if(movingObject.toString == 'EULinePointA'){
-                movingObject.position = event.point;
-            }else{
-                var lineStroke = movingObject.relatedObjects[1];
-                point2.position = event.point;
-                var coeficienteAngular = coef(point1.position, event.point);
-                var lineY0 = getLineY(point1.position, 0, coeficienteAngular);
-                var lineYwidth = getLineY(point1.position, $("#canvas").width(), coeficienteAngular);
-                tempPath.segments[0].point = new paper.Point(0,lineY0);
-                tempPath.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+        } else if(movingObject.toString.indexOf("Line") != -1){
+            movingObject.position = event.point;
+            var lineStroke = movingObject.relatedObjects[1];
+            var coeficienteAngular = coef(movingObject.relatedObjects[0].position, event.point);
+            var lineY0 = getLineY(event.point, 0, coeficienteAngular);
+            var lineYwidth = getLineY(event.point, $("#canvas").width(), coeficienteAngular);
+            lineStroke.segments[0].point = new paper.Point(0,lineY0);
+            lineStroke.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+        } else if(movingObject.toString.indexOf("Ray") != -1){
+            movingObject.position = event.point;
+            var lineStroke = movingObject.relatedObjects[1];
+            var coeficienteAngular = coef(movingObject.relatedObjects[0].position, movingObject.position);
+            var lineYwidth;
+
+            if(coeficienteAngular != Number.POSITIVE_INFINITY && coeficienteAngular != Number.NEGATIVE_INFINITY){
+                if(movingObject.toString == "EURayPointB"){
+                    if(movingObject.position.x <= movingObject.relatedObjects[0].position.x){
+                        lineYwidth = getLineY(movingObject.position, 0, coeficienteAngular);
+                        lineStroke.segments[1].point = new paper.Point(0, lineYwidth);
+                    } else{
+                        lineYwidth = getLineY(movingObject.position, $("#canvas").width(), coeficienteAngular);
+                        lineStroke.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+                    }    
+                } else {
+                    lineStroke.segments[0].point = event.point;
+                    if(movingObject.position.x >= movingObject.relatedObjects[0].position.x){
+                        lineYwidth = getLineY(movingObject.position, 0, coeficienteAngular);
+                        lineStroke.segments[1].point = new paper.Point(0, lineYwidth);
+                    } else{
+                        lineYwidth = getLineY(movingObject.position, $("#canvas").width(), coeficienteAngular);
+                        lineStroke.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+                    }   
+                }
+            } else {
+                if(coeficienteAngular == Number.POSITIVE_INFINITY){
+                    if(movingObject.toString == "EURayPointB"){
+                        lineStroke.segments[1].point = new paper.Point(event.point.x,0);
+                    }else{
+                        lineStroke.segments[1].point = new paper.Point(event.point.x, $("#canvas").height());
+                    }    
+                } else{
+                    if(movingObject.toString == "EURayPointB"){
+                        lineStroke.segments[1].point = new paper.Point(event.point.x,$("#canvas").height());
+                    }else{
+                        lineStroke.segments[1].point = new paper.Point(event.point.x, 0);
+                    }    
+                }
             }
+            lineStroke.sendToBack();
         }
     }   
 }
@@ -226,7 +263,8 @@ function moveOrDrag(event){
                             center: point1.position,
                             radius: distanceBetween2points(point1.position, point2.position),
                             strokeColor: 'black'
-                         }); 
+                         });
+            tempPath.sendToBack(); 
         }else{
             point2.position = event.point;
             tempPath.remove();
@@ -235,7 +273,6 @@ function moveOrDrag(event){
                             radius: distanceBetween2points(point1.position, point2.position),
                             strokeColor: 'black'
                          }); 
-            
         }
     } else if(!isConstructing && currentBtn == 'line'){
         if(point2 == null){
@@ -250,13 +287,19 @@ function moveOrDrag(event){
                                 to: point2.position,
                                 strokeColor: 'black'
                             });
+            tempPath.sendToBack();
         } else {
             point2.position = event.point;
             var coeficienteAngular = coef(point1.position, event.point);
             var lineY0 = getLineY(point1.position, 0, coeficienteAngular);
             var lineYwidth = getLineY(point1.position, $("#canvas").width(), coeficienteAngular);
-            tempPath.segments[0].point = new paper.Point(0,lineY0);
-            tempPath.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+            if(coeficienteAngular != Number.POSITIVE_INFINITY && coeficienteAngular != Number.NEGATIVE_INFINITY){
+                tempPath.segments[0].point = new paper.Point(0,lineY0);
+                tempPath.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+            } else {
+                tempPath.segments[0].point = new paper.Point(event.point.x, 0);
+                tempPath.segments[1].point = new paper.Point(event.point.x, $("#canvas").height());
+            }
         }
     } else if(!isConstructing && currentBtn == 'ray'){
         if(point2 == null){
@@ -271,19 +314,37 @@ function moveOrDrag(event){
                                 to: point2.position,
                                 strokeColor: 'black'
                             });
+            tempPath.sendToBack();
         } else {
             point2.position = event.point;
-
-
             var coeficienteAngular = coef(point1.position, event.point);
             var lineYwidth;
-            if(point2.position.x <= point1.position.x){
-                lineYwidth = getLineY(point1.position, 0, coeficienteAngular);
-                tempPath.segments[1].point = new paper.Point(0, lineYwidth);
-            } else{
-                lineYwidth = getLineY(point1.position, $("#canvas").width(), coeficienteAngular);
-                tempPath.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+
+            if(coeficienteAngular != Number.POSITIVE_INFINITY && coeficienteAngular != Number.NEGATIVE_INFINITY){
+                if(point2.position.x <= point1.position.x){
+                    lineYwidth = getLineY(point1.position, 0, coeficienteAngular);
+                    tempPath.segments[1].point = new paper.Point(0, lineYwidth);
+                } else{
+                    lineYwidth = getLineY(point1.position, $("#canvas").width(), coeficienteAngular);
+                    tempPath.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+                }
+            } else {
+                 if(coeficienteAngular == Number.POSITIVE_INFINITY){
+                    if(point2.toString == "EURayPointB"){
+                        tempPath.segments[1].point = new paper.Point(event.point.x,$("#canvas").height());
+                    }else{
+                        tempPath.segments[1].point = new paper.Point(event.point.x, 0);
+                    }    
+                } else{
+                    if(point2.toString == "EURayPointB"){
+                        tempPath.segments[1].point = new paper.Point(event.point.x,0);
+                    }else{
+                        tempPath.segments[1].point = new paper.Point(event.point.x, $("#canvas").height());
+                    }    
+                }
             }
+
+            
         }
     } else if(isConstructing && currentBtn == 'selection'){
         project.activeLayer.selected = false;
@@ -300,7 +361,15 @@ function distanceBetween2points(pointA, pointB){
     return Math.sqrt(Math.pow((pointA.x - pointB.x),2)+Math.pow((pointA.y - pointB.y),2))
 }
 
-
+function unselectObjects(){
+    var selectedSize = selectedObjects.length;
+    for(var i = 0; i < selectedSize; i++){
+        var object = selectedObjects.pop();
+        if(object.shadowClone != null)
+            object.shadowClone.remove();
+        object.shadowClone = null;
+    }
+}
 
 var segmentHitResult, pathHitResult;
 var movepathHitResult = false;
@@ -311,26 +380,25 @@ function testHitOnProject(event){
     var hitResult = project.hitTestAll(event.point, hitOptions);
     if (hitResult.length == 0){
         project.activeLayer.selected = false;
-        var selectedSize = selectedObjects.length;
-        for(var i = 0; i < selectedSize; i++){
-            var object = selectedObjects.pop();
-            if(object.shadowClone != null)
-                object.shadowClone.remove();
-            object.shadowClone = null;
-        }
+        unselectObjects();
         return;
-    } else if (hitResult.length > 0 && hitResult[0].isClone){
+    } else if (hitResult.length > 0 && hitResult[0].item.isClone){
         return;
     } else {
         for(var i = 0; i < hitResult.length; i++){
-            createShadow(hitResult[i].item);
-            selectedObjects.push(hitResult[i].item);
-            if(hitResult[i].item.toString != "RegularPoint"){
-                createShadow(hitResult[i].item.relatedObjects[0]);
-                selectedObjects.push(hitResult[i].item.relatedObjects[0]);
-                createShadow(hitResult[i].item.relatedObjects[1]);
-                selectedObjects.push(hitResult[i].item.relatedObjects[1]);
-            }    
+            if(selectedObjects.indexOf(hitResult[i].item) == -1){
+                if(hitResult[i].item.shadowClone != null) return;
+                createShadow(hitResult[i].item);
+                selectedObjects.push(hitResult[i].item);
+                if(hitResult[i].item.toString != "EURegularPoint"){
+                    createShadow(hitResult[i].item.relatedObjects[0]);
+                    selectedObjects.push(hitResult[i].item.relatedObjects[0]);
+                    createShadow(hitResult[i].item.relatedObjects[1]);
+                    selectedObjects.push(hitResult[i].item.relatedObjects[1]);
+                }        
+            }else{
+                return;
+            }
         }
     }   
 }
@@ -357,7 +425,6 @@ function createShadow(item){
 function highlightMethod(event){
     segmentHitResult = pathHitResult = null;
     var hitResult = project.hitTestAll(event.point, hitOptions);
-
     if (hitResult.length == 0 || hitResult[0].item.isClone){
         project.activeLayer.selected = false;
         return;
@@ -365,7 +432,7 @@ function highlightMethod(event){
         for(var i = 0; i < hitResult.length; i++){
             if(!hitResult[i].item.isClone){
                 hitResult[i].item.selected = true;
-                if(hitResult[i].item.toString != "RegularPoint"){
+                if(hitResult[i].item.toString != "EURegularPoint"){
                     hitResult[i].item.relatedObjects[0].selected = true;
                     hitResult[i].item.relatedObjects[1].selected = true;
                 }    
@@ -373,6 +440,5 @@ function highlightMethod(event){
             }
         }
     }   
-
 }
 
