@@ -111,18 +111,41 @@ function moveObject(event){
     if (movingObject == null){
         return;
     } else {
-        if(movingObject.toString.indexOf("oint") != -1 && movingObject.toString != 'EUIntersectionPoint'){
-            if(movingObject.toString == "EURegularPoint"){
-                movingObject.position = event.point;
-            } else if (movingObject.toString.indexOf("Segment" != -1) ){
-                movingObject.position = event.point;
-                if(movingObject.toString.indexOf("PointA"!=-1)){
-                    movingObject.relatedObjects[1].segments[1].point = event.point;
-                }else{
-                    movingObject.relatedObjects[1].segments[0].point = event.point;
-                }
+        if(movingObject.toString == "EURegularPoint"){
+            movingObject.position = event.point;
+        } else if (movingObject.toString.indexOf("Segment") != -1 ){
+            movingObject.position = event.point;
+            if(movingObject.toString == 'EUSegmentPointA'){
+                movingObject.relatedObjects[1].segments[0].point = event.point;
+            }else{
+                movingObject.relatedObjects[1].segments[1].point = event.point;
             }
-        }               
+        } else if (movingObject.toString.indexOf("Circunference") != -1){
+            if(movingObject.toString == "EUCircunferenceCenterPoint"){
+                movingObject.position = event.point;
+                var circleStroke = movingObject.relatedObjects[1];
+                var scaleFactor = distanceBetween2points(movingObject.position, movingObject.relatedObjects[0].position) / (circleStroke.bounds.width/2);
+                circleStroke.scale(scaleFactor);
+                circleStroke.position = event.point;
+            }else{
+                movingObject.position = event.point;
+                var circleStroke = movingObject.relatedObjects[1];
+                var scaleFactor = distanceBetween2points(movingObject.position, movingObject.relatedObjects[0].position) / (circleStroke.bounds.width/2);
+                circleStroke.scale(scaleFactor);
+            }
+        } else if(movingObject.toString.indexOf("EULineStroke")){
+            if(movingObject.toString == 'EULinePointA'){
+                movingObject.position = event.point;
+            }else{
+                var lineStroke = movingObject.relatedObjects[1];
+                point2.position = event.point;
+                var coeficienteAngular = coef(point1.position, event.point);
+                var lineY0 = getLineY(point1.position, 0, coeficienteAngular);
+                var lineYwidth = getLineY(point1.position, $("#canvas").width(), coeficienteAngular);
+                tempPath.segments[0].point = new paper.Point(0,lineY0);
+                tempPath.segments[1].point = new paper.Point($("#canvas").width(), lineYwidth);
+            }
+        }
     }   
 }
 

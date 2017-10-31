@@ -318,7 +318,7 @@ function CreateLine(){
 							    to: new paper.Point($("#canvas").width(), lineYwidth),
 							    strokeColor: 'black'
 						 	});
-			this.line.toString = "LineStroke";
+			this.line.toString = "EULineStroke";
 			this.line.relatedObjects = [this.pointA, this.pointB];
 			this.pointA.relatedObjects.push(this.line);
 			this.pointB.relatedObjects.push(this.line);
@@ -338,14 +338,14 @@ function CreateLine(){
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointA.toString = "LinePoint";
+		this.pointA.toString = "EULinePointA";
 		this.pointB = new paper.Path.Circle({
     						center: new paper.Point(b_x, b_y),
     						radius: 4,
     						strokeColor: 'black',
     						fillColor: 'blue'
 						 });
-		this.pointB.toString = "LinePoint";
+		this.pointB.toString = "EULinePointB";
 		this.pointB.relatedObjects = [this.pointA];
 		this.pointA.relatedObjects = [this.pointB];
 	}
@@ -448,7 +448,6 @@ function CreateRay(){
 		this.line.remove();
 	}
 }
-
 
 function coef(pontoA, pontoB){
     var coef = (pontoA.y - pontoB.y)/(pontoA.x - pontoB.x);
