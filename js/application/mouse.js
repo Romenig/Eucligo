@@ -13,6 +13,13 @@ var hitOptions = {
     tolerance: 5
 };
 
+var grabOptions = {
+    segments: true,
+    stroke: true,
+    fill: true,
+    tolerance: 8
+};
+
 var segment, path;
 var movePath = false;
 
@@ -186,6 +193,33 @@ function moveObject(event){
     }   
 }
 
+var hasGrabbed = false;
+var grabbedPoint = null;
+
+function grabPointForCrunstruction(event){
+    segmentHitResult = pathHitResult = null;
+    var hitResult = project.hitTest(event.point, grabOptions);
+    if(hitResult == null || hitResult.item.isClone){
+        if(grabbedPoint != null){
+            grabbedPoint.shadowClone.remove();
+            grabbedPoint.shadowClone = null;
+        }
+        grabbedPoint = null;
+        hasGrabbed = false;
+        return;
+    } else {
+        console.log(hitResult.item);
+        if(hitResult.item.toString.indexOf("oint") != -1){
+            if(hitResult.item.shadowClone != null){
+                return;
+            }
+            grabbedPoint = hitResult.item;
+            hasGrabbed = true;
+            createGrabShadow(grabbedPoint);
+        }
+    }
+}
+
 function selectMovingObject(event){
     segmentHitResult = pathHitResult = null;
     var hitResult = project.hitTest(event.point, hitOptions);
@@ -225,15 +259,27 @@ function mousedrag(event){
 }
 
 function initConstruction(point){
-    point1 = new paper.Path.Circle({
+    if(hasGrabbed){
+        point1 = grabbedPoint;
+        grabbedPoint.shadowClone.remove();
+        grabbedPoint.shadowClone = null;
+        grabbedPoint = null;
+        hasGrabbed = false;    
+    } else {
+        point1 = new paper.Path.Circle({
                             center: new paper.Point(point.x, point.y),
                             radius: 4,
                             strokeColor: 'black',
                             fillColor: 'blue'
                          });
+    }
 }
 
 function moveOrDrag(event){
+    if(currentBtn == 'segment'){
+        console.log("ta varrendo")
+        grabPointForCrunstruction(event);    
+    }
     if(!isConstructing && currentBtn == 'segment'){
         if(point2 == null){
             point2 = new paper.Path.Circle({
@@ -416,7 +462,18 @@ function generateIntersections(){
 function createShadow(item){
     var clone = item.clone();
     clone.strokeWidth = 10;
-    clone.strokeColor = new paper.Color(0.7,0.7,1,0.4);
+    clone.strokeColor = new paper.Color(0.7,0.7, 1, 0.4)
+    clone.sendToBack();
+    clone.isClone = true;
+    item.shadowClone = clone;
+    
+}
+
+function createGrabShadow(item){
+var clone = item.clone();
+    clone.scale(3.5);
+    clone.strokeColor = new paper.Color(0.7,0.7,1,1);
+    clone.fillColor = new paper.Color(0.7,0.7,1,0.4);
     clone.sendToBack();
     clone.isClone = true;
     item.shadowClone = clone;
